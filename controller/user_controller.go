@@ -10,7 +10,7 @@ type UserController struct {
 }
 
 
-func (h *UserController) Register(c *fiber.Ctx) error {
+func (h UserController) Register(c *fiber.Ctx) error {
 	var user domain.User
 	if err := c.BodyParser(&user); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
@@ -18,13 +18,28 @@ func (h *UserController) Register(c *fiber.Ctx) error {
 	if err := h.usecase.Register(&user); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 	}
-	return c.Status(fiber.StatusCreated).JSON(user)
+	return c.Status(fiber.StatusCreated).JSON(user.ToJson())
 }
+
+func (h UserController) Login(c *fiber.Ctx) error {
+	var user domain.User
+	if err := c.BodyParser(&user); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+	}
+	token, err := h.usecase.Login(user.Email, user.Password);
+
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"token": token})
+}
+
 
 func NewUserController(usecase domain.UserUsecase) *UserController {
 	return &UserController{usecase}
 }
 
 func (c UserController) Route(r fiber.Router) {
-	r.Get("/register", c.Register)
+	r.Post("/register", c.Register);
+	r.Post("/login", c.Login)
 }

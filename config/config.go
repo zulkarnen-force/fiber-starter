@@ -2,12 +2,33 @@ package config
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/joho/godotenv"
 	"github.com/zulkarnen-force/fiber-starter/domain"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
+
+
+type Config struct {
+	Port string
+}
+
+var AppConfig Config
+
+
+func LoadConfig() {
+    err := godotenv.Load()
+    if err != nil {
+	   log.Fatalf("Error loading .env file: %v", err)
+    }
+
+    AppConfig = Config{
+	   Port: getEnv("PORT", "3000"),
+    }
+}
 
 var DB *gorm.DB
 

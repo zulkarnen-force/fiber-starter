@@ -1,13 +1,37 @@
 // domain/user.go
 package domain
 
+
 type DBType string
 
 type User struct {
 	ID       uint   `json:"id"`
 	Name     string `json:"name"`
 	Email    string `json:"email"`
-	Password string `json:"-"`
+	Password string `json:"password"`
+}
+
+type UserRequest struct {
+	Name     string `json:"name"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+type UserResponse struct {
+	Name     string `json:"name"`
+	Email    string `json:"email"`
+}
+
+func (u *User) TableName() string {
+	return "users"
+}
+
+
+func (u *User) ToJson() UserResponse {
+	return UserResponse{
+		Name: u.Name,
+		Email: u.Email,
+	}
 }
 
 type UserRepository interface {

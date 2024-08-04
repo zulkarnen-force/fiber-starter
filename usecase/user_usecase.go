@@ -3,6 +3,7 @@ package usecase
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
 	jtoken "github.com/golang-jwt/jwt/v4"
@@ -38,6 +39,10 @@ func (u *userUsecase) Login(email, password string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
+	fmt.Println(user.Password);
+	fmt.Println(password)
+
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil {
 		return "", errors.New("invalid credentials")
 	}
